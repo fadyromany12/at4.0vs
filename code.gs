@@ -172,10 +172,9 @@ function webUpdateReportingLine(userEmail, newSupervisorEmail) {
 // ==========================================================
 
 /**
- * (REPLACED)
- * Saves a new coaching session and its detailed scores.
- * Matches the new frontend form.
- */
+ * (REPLACED FOR DYNAMIC TEMPLATES - PHASE 4)
+ * Saves a new coaching session and its detailed scores from any template.
+ */
 function webSubmitCoaching(sessionObject) {
   try {
     const ss = getSpreadsheet();
@@ -244,7 +243,6 @@ function webSubmitCoaching(sessionObject) {
     return "Error: " + err.message;
   }
 }
-
 
 /**
  * (REPLACED FOR DYNAMIC TEMPLATES - PHASE 4)
@@ -475,7 +473,6 @@ function webGetManagerHierarchy() {
   }
 }
 
-
 // === NEW: Web App API to get all reports (flat list) ===
 function webGetAllSubordinateEmails(managerEmail) {
     try {
@@ -646,7 +643,7 @@ function punch(action, targetUserName, puncherEmail, adminTimestamp) { 
         shiftEndStr = Utilities.formatDate(schEnd, timeZone, "HH:mm:ss");
       } else {
         shiftEndStr = (schEnd || "").toString(); 
-       }
+        }
           
       leaveType = (schLeave || "").toString().trim();
       break;
@@ -691,8 +688,8 @@ function punch(action, targetUserName, puncherEmail, adminTimestamp) { 
     }
     const sequentialErrors = {
       "First Break Out": { required: punches.firstBreakIn, msg: "You must punch 'First Break In' first." },
-      "Lunch Out":       { required: punches.lunchIn,     msg: "You must punch 'Lunch In' first." },
-      "Last Break Out":  { required: punches.lastBreakIn,   msg: "You must punch 'Last Break In' first." }
+      "Lunch Out":       { required: punches.lunchIn,     msg: "YouS must punch 'Lunch In' first." },
+      "Last Break Out":  { required: punches.lastBreakIn,   msg: "YouS must punch 'Last Break In' first." }
     };
     if (sequentialErrors[action] && !sequentialErrors[action].required) {
       throw new Error(sequentialErrors[action].msg);
@@ -1224,7 +1221,7 @@ function dailyLeaveSweeper() {
         logsSheet.appendRow([new Date(), userName, schEmail, "Auto-Log Leave", leaveType]);
         missedLogs++;
         
-         // Add to lookup so we don't process them again if they have duplicate schedules
+  _       // Add to lookup so we don't process them again if they have duplicate schedules
         adherenceLookup.add(lookupKey); 
       }
     } catch (e) {
@@ -1247,47 +1244,49 @@ function convertDateToString(dateObj) {
 
 // (No Change)
 function getMyRequests(userEmail) {
-  const ss = getSpreadsheet();
-  const reqSheet = getOrCreateSheet(ss, SHEET_NAMES.leaveRequests);
-  const allData = reqSheet.getDataRange().getValues();
-  const timeZone = Session.getScriptTimeZone();
-  const dbSheet = getOrCreateSheet(ss, SHEET_NAMES.database);
-  const userData = getUserDataFromDb(dbSheet);
-  const myRequests = [];
-  
-  for (let i = allData.length - 1; i > 0; i--) { 
-    const row = allData[i];
-    if (String(row[2] || "").trim().toLowerCase() === userEmail) {
-      try { 
-        const startDate = new Date(row[5]);
-        const endDate = new Date(row[6]);
-        const requestedDateNum = Number(row[0].split('_')[1]);
+  const ss = getSpreadsheet();
+  const reqSheet = getOrCreateSheet(ss, SHEET_NAMES.leaveRequests);
+  const allData = reqSheet.getDataRange().getValues();
+  const timeZone = Session.getScriptTimeZone();
+  const dbSheet = getOrCreateSheet(ss, SHEET_NAMES.database);
+  const userData = getUserDataFromDb(dbSheet);
+  const myRequests = [];
 
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || isNaN(requestedDateNum)) {
-          Logger.log(`Skipping Row ${i+1}. It contains invalid date data.`);
-          continue; 
-        }
+  for (let i = allData.length - 1; i > 0; i--) { 
+    const row = allData[i];
+    if (String(row[2] || "").trim().toLowerCase() === userEmail) {
+      try { 
+        const startDate = new Date(row[5]);
+        const endDate = new Date(row[6]);
+        const requestedDateNum = Number(row[0].split('_')[1]);
 
-        const supervisorEmail = row[11]; 
-        myRequests.push({
-          requestID: row[0],
-          status: row[1],
-          leaveType: row[4],
-          startDate: convertDateToString(startDate),
-          endDate: convertDateToString(endDate),
-          totalDays: row[7],
-          reason: row[8],
-          requestedDate: convertDateToString(new Date(requestedDateNum)),
-          supervisorName: userData.emailToName[supervisorEmail] || supervisorEmail 
-        });
-      } catch (e) {
-        Logger.log(`CRITICAL ERROR processing row ${i+1} for getMyRequests. Error: ${e.message}`);
-      }
-    }
-  }
-  return myRequests;
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || isNaN(requestedDateNum)) {
+          Logger.log(`Skipping Row ${i+1}. It contains invalid date data.`);
+          continue; 
+        }
+
+        // *** THIS WAS THE FIX (stray 's' removed) ***
+        const supervisorEmail = row[11]; 
+        // ********************************************
+
+        myRequests.push({
+          requestID: row[0],
+          status: row[1],
+          leaveType: row[4],
+          startDate: convertDateToString(startDate),
+          endDate: convertDateToString(endDate),
+          totalDays: row[7],
+          reason: row[8],
+          requestedDate: convertDateToString(new Date(requestedDateNum)),
+          supervisorName: userData.emailToName[supervisorEmail] || supervisorEmail 
+        });
+      } catch (e) {
+        Logger.log(`CRITICAL ERROR processing row ${i+1} for getMyRequests. Error: ${e.message}`);
+      }
+    }
+  }
+  return myRequests;
 }
-
 // (No Change)
 function getPendingRequests(adminEmail, filter) {
   const ss = getSpreadsheet();
@@ -2095,22 +2094,16 @@ function updateReportingLine(adminEmail, userEmail, newSupervisorEmail) {
   ]);
   
   return `${userName} has been successfully reassigned to ${newSupervisorName}.`;
-}// ==========================================================
+}
+// ==========================================================
 // === NEW COACHING TEMPLATE FUNCTIONS (PHASE 3) ===
 // ==========================================================
 
 /**
- * (MODIFIED - PHASE 4 Migration)
- * Gets all non-archived coaching templates.
- * Automatically creates the default template if it's missing.
+ * Gets all non-archived coaching templates and their criteria.
  */
 function webGetCoachingTemplates() {
   try {
-    // --- NEW: Run the migration helper ---
-    // This will create the "Quality Score (Default)" template if it doesn't exist
-    _createDefaultQualityTemplate();
-    // ------------------------------------
-
     const ss = getSpreadsheet();
     const templateSheet = getOrCreateSheet(ss, "CoachingTemplates");
     const criteriaSheet = getOrCreateSheet(ss, "CoachingTemplateCriteria");
@@ -2141,7 +2134,7 @@ function webGetCoachingTemplates() {
       const row = templateData[i];
       const templateID = row[0];
       const isArchived = row[4];
-
+      
       // Only return non-archived templates
       if (isArchived !== true) {
         templates.push({
@@ -2153,7 +2146,7 @@ function webGetCoachingTemplates() {
         });
       }
     }
-
+    
     return templates;
 
   } catch (err) {
@@ -2273,115 +2266,4 @@ function webDeleteCoachingTemplate(templateID) {
     Logger.log("webDeleteCoachingTemplate Error: " + err.message);
     return { error: err.message };
   }
-}
-/**
- * (NEW - PHASE 4 Migration)
- * This is a helper function that automatically creates the
- * original "Quality Score" template in the new dynamic system.
- */
-function _createDefaultQualityTemplate() {
-  Logger.log("Creating default Quality Score template...");
-
-  // This object definition is copied from your original HTML file
-  const qualityCategories = [
-    { 
-      category: "Greeting & Opening",
-      criteria: [
-        "Agent greeted the customer professionally and introduced themselves appropriately",
-        "Agent confirmed the customer’s name & purpose of the call/chat"
-      ]
-    },
-    {
-      category: "Communication Skills & Understanding Needs",
-      criteria: [
-        "Agent conversed actively without interrupting",
-        "Agent asked relevant questions to understand customer needs",
-        "Agent acknowledged customer concerns appropriately",
-        "Language was clear, understandable, and free of jargon",
-        "Agent applied correct hold etiquettes",
-        "Tone was confident, professional and engaging"
-      ]
-    },
-    {
-      category: "Product Knowledge & providing solution",
-      criteria: [
-        "Agent demonstrated strong knowledge of Lenovo products/services",
-        "Agent offered the right solution based on customer's needs",
-        "Agent was able to handle objections confidently & Highlighted Lenovo's competitive advantage"
-      ]
-    },
-    {
-      category: "Tools usage and Chat/ Call Logging",
-      criteria: [
-        "Agent applied correct disposition.",
-        "Agent logged the chat with all relevant details in Dynamics 365 B2C"
-      ]
-    },
-    {
-      category: "Sales Closing & Call to Action",
-      criteria: [
-        "Agent clearly stated pricing, offers, and benefits.",
-        "Agent confirmed next steps (e.g., sending a quote, scheduling a follow-up)"
-      ]
-    },
-    {
-      category: "Process Compliance",
-      criteria: [
-        "Agent followed Lenovo's sales process & compliance guidelines. OR Agent transfered the chat to the approriate que when applicable"
-      ]
-    },
-    {
-      category: "Wrap-Up & Closing",
-      criteria: [
-        "Agent confirmed if the customer’s query was fully addressed",
-        "Agent ended the chat approprietly.",
-        "Follow-up commitment created (if applicable)"
-      ]
-    }
-  ];
-
-  // 1. Build the template object in the new format
-  const templateObject = {
-    templateID: "default-quality-score", // Use a fixed, special ID
-    templateName: "Quality Score (Default)",
-    criteria: []
-  };
-
-  qualityCategories.forEach(cat => {
-    cat.criteria.forEach(crit => {
-      templateObject.criteria.push({
-        category: cat.category,
-        criteriaText: crit,
-        inputType: 'score_0-1', // This was the input type for all old items
-        weight: 1
-      });
-    });
-  });
-
-  // 2. Get the template sheet
-  const ss = getSpreadsheet();
-  const templateSheet = getOrCreateSheet(ss, "CoachingTemplates");
-
-  // 3. Check if it already exists (to prevent duplicates)
-  const templateData = templateSheet.getRange(2, 1, templateSheet.getLastRow() - 1, 2).getValues();
-  let exists = false;
-  for (let i = 0; i < templateData.length; i++) {
-    if (templateData[i][0] === templateObject.templateID || templateData[i][1] === templateObject.templateName) {
-      exists = true;
-      break;
-    }
-  }
-
-  // 4. If it doesn't exist, save it
-  if (!exists) {
-    Logger.log("Default template not found. Saving it now.");
-    // We call the save function directly from the server-side
-    webSaveCoachingTemplate(templateObject);
-  } else {
-    Logger.log("Default template already exists. Skipping creation.");
-  }
-}
-function testConnection() {
-  Logger.log("Test connection was successful.");
-  return "It works! The backend file is okay.";
 }
