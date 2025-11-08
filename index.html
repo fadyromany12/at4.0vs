@@ -355,7 +355,7 @@
         border-bottom: 3px solid var(--konecta-blue);
         background-color: var(--input-bg);
       }
-      #schedule-tab-button, #leave-approval-tab-button, #history-report-tab-button, #dashboard-tab-button, #my-schedule-tab-button, #reporting-line-tab-button, #admin-tools-tab-button {
+      #schedule-tab-button, #leave-approval-tab-button, #history-report-tab-button, #dashboard-tab-button, #my-schedule-tab-button, #reporting-line-tab-button, #admin-tools-tab-button, #coaching-admin-tab-button {
         display: none;
       }
       
@@ -1332,7 +1332,7 @@
             <input type="checkbox" id="dark-mode-toggle">
             <label for="dark-mode-toggle" class="switch-label">
                 <span class="sun-icon">☀️</span>
-                <span class="moon-icon">🌑</span>
+                <span class="moon-icon">🌙</span>
             </label>
         </div>
         
@@ -1356,7 +1356,6 @@
         <button id="reporting-line-tab-button" class="tab-button" onclick="showTab('reporting-line')">Reporting Line</button>
         <button id="coaching-tab-button" class="tab-button" onclick="showTab('coaching')">Coaching</button>
         <button id="coaching-admin-tab-button" class="tab-button" onclick="showTab('coaching-admin')">Coaching Admin</button>
-        
       </div>
 
       <div class="content-container">
@@ -1366,8 +1365,6 @@
         <!-- ================================== -->
         <div id="punch-panel" class="tab-panel">
           <div id="agent-info">Loading user info...</div> 
-
-          
           <div id="admin-panel"><label for="agent-select">Punch For:</label><select id="agent-select"></select></div>
           <div id="buttons">
             <div class="button-group"><button onclick="punch('Login')">Login</button></div>
@@ -1384,6 +1381,9 @@
           <div id="status" class="status-message"></div>
         </div>
 
+        <!-- ================================== -->
+        <!--      TAB 2: MY SCHEDULE PANEL      -->
+        <!-- ================================== -->
         <div id="my-schedule-panel" class="tab-panel">
           <h2>My Upcoming Schedule</h2>
           <p>Your schedule for the next 7 days.</p>
@@ -1391,6 +1391,9 @@
           <div id="my-schedule-display"></div>
         </div>
 
+        <!-- ================================== -->
+        <!--     TAB 3: MY LEAVE PANEL          -->
+        <!-- ================================== -->
         <div id="leave-request-panel" class="tab-panel">
           <h2>My Balances</h2>
           <div id="leave-balances">
@@ -1402,7 +1405,7 @@
             <h2>Submit Leave Request</h2>
             <div class="form-group"><label for="leave-type">Leave Type</label><select id="leave-type"><option value="Annual">Annual</option><option value="Sick">Sick</option><option value="Casual">Casual</option></select></div>
             <div class="form-row">
-               <div class="form-group"><label for="leave-start-date">Start Date</label><input type="date" id="leave-start-date" required></div>
+              <div class="form-group"><label for="leave-start-date">Start Date</label><input type="date" id="leave-start-date" required></div>
               <div class="form-group"><label for="leave-end-date">End Date</label><input type="date" id="leave-end-date"><small>Leave blank for a single-day request.</small></div>
             </div>
             <div class="form-group"><label for="leave-reason">Reason (Optional)</label><textarea id="leave-reason" rows="3"></textarea></div>
@@ -1415,16 +1418,21 @@
           </div>
         </div>
         
+        <!-- ================================== -->
+        <!--    TAB 4: HISTORY REPORT PANEL     -->
+        <!-- ================================== -->
         <div id="history-report-panel" class="tab-panel">
           <h2>Adherence History Report</h2>
           <form id="history-report-form" class="form-container">
+            <!-- MODIFIED: Replaced standard select with custom multi-select structure -->
             <div class="form-group" id="history-user-select-container" style="display: none;">
               <label>Select User(s)</label>
               <button type="button" id="custom-history-select-button" class="custom-select-button" onclick="toggleUserDropdown('history', event)">
                 Select Users (0 selected)
               </button>
               <div id="custom-history-select-dropdown" class="custom-select-dropdown" onclick="event.stopPropagation()">
-                </div>
+                <!-- Options will be dynamically populated here -->
+              </div>
             </div>
             <div class="form-group">
               <label for="history-start-date">Start Date</label>
@@ -1444,6 +1452,9 @@
           </div>
         </div>
 
+        <!-- ================================== -->
+        <!--    TAB 5: SCHEDULE EDITOR PANEL    -->
+        <!-- ================================== -->
         <div id="schedule-panel" class="tab-panel">
           <form id="csv-import-form" class="form-container">
             <h2>Bulk Schedule Importer (CSV)</h2>
@@ -1475,6 +1486,9 @@
           <div id="schedule-status" class="status-message"></div>
         </div>
         
+        <!-- ================================== -->
+        <!--   TAB 6: LEAVE APPROVALS PANEL     -->
+        <!-- ================================== -->
         <div id="leave-approval-panel" class="tab-panel">
           <h2>Pending Leave Approvals</h2>
           <div id="approval-filter-nav">
@@ -1485,6 +1499,9 @@
           <div id="pending-requests-list" class="request-list"></div>
         </div>
         
+        <!-- ================================== -->
+        <!--     TAB 7: ADMIN TOOLS PANEL       -->
+        <!-- ================================== -->
         <div id="admin-tools-panel" class="tab-panel">
           <form id="manual-punch-form" class="form-container">
             <h2>Manual Punch Editor</h2>
@@ -1498,7 +1515,7 @@
           
           <hr class="section-divider">
           
-          <form id="balance-adjustment-form" class="form-container">
+           <form id="balance-adjustment-form" class="form-container">
             <h2>Leave Balance Management</h2>
             <p class="text-color-secondary">Manually adjust a user's leave balance. Use a positive number (e.g., 2) to add days, and a negative number (e.g., -1) to remove days.</p>
             <div class="form-group"><label for="balance-user-select">Select User</label><select id="balance-user-select" required></select></div>
@@ -1526,10 +1543,14 @@
           <div id="admin-leave-status" class="status-message"></div>
         </div>
 
+        <!-- ================================== -->
+        <!--     TAB 8: DASHBOARD PANEL         -->
+        <!-- ================================== -->
         <div id="dashboard-panel" class="tab-panel">
           <h2 id="dashboard-title">Team Dashboard</h2>
           <div id="dashboard-controls" class="form-container">
             <form id="dashboard-form">
+              <!-- NEW: Hierarchy Selection -->
               <div class="form-group" id="dashboard-hierarchy-container">
                 <label>Team Hierarchy (Click user to select)</label>
                 <div id="hierarchy-tree-view">
@@ -1537,7 +1558,7 @@
                 </div>
                 <small class="text-color-secondary">Selected: <strong id="selected-user-display">None</strong></small>
               </div>
-             
+              
               <div class="form-group">
                 <label for="dashboard-date">Select Date</label>
                 <input type="date" id="dashboard-date" required>
@@ -1554,22 +1575,32 @@
           
           <hr class="section-divider">
           
+          <!-- MODIFIED: The grid is now responsive with 2 columns on desktop -->
           <div id="dashboard-grid">
+            <!-- MODIFIED: Added full-width class and removed the second card to make Agent Status fill the top row -->
             <div class="dashboard-card full-width">
+              <!-- MODIFIED: Changed the title to reflect the new list display -->
               <h3>Agent Status (Real-Time)</h3>
+              <!-- MODIFIED: This now holds the list of agents and their statuses -->
               <div id="status-agent-list" class="chart-container"></div>
             </div>
+            <!-- Removed 'Total Adherence Deviations' card -->
             <div class="dashboard-card full-width">
               <h3>Adherence Details (Today)</h3>
+              <!-- MODIFIED: Changed the container to display list-style cards -->
               <div id="adherence-detail-table" class="dashboard-list-container"></div>
             </div>
             <div class="dashboard-card full-width">
               <h3>Pending Leave Requests (for selected users)</h3>
+              <!-- MODIFIED: Changed the container to display list-style cards -->
               <div id="pending-leave-table" class="dashboard-list-container"></div>
             </div>
           </div>
         </div>
         
+        <!-- ================================== -->
+        <!--    NEW TAB 9: REPORTING LINE       -->
+        <!-- ================================== -->
         <div id="reporting-line-panel" class="tab-panel">
           <form id="reporting-line-form" class="form-container">
             <h2>Update User Reporting Line</h2>
@@ -1579,7 +1610,7 @@
               <label for="reporting-line-user">Select User to Move</label>
               <select id="reporting-line-user" required></select>
             </div>
-           
+            
             <div class="form-group">
               <label for="reporting-line-supervisor">Assign to New Supervisor</label>
               <select id="reporting-line-supervisor" required></select>
@@ -1590,118 +1621,176 @@
           <div id="reporting-line-status" class="status-message"></div>
         </div>
 
+        <!-- ================================== -->
+        <!--    NEW TAB 10: COACHING PANEL      -->
+        <!-- ================================== -->
         <div id="coaching-panel" class="tab-panel">
-
-      <div id="coaching-form-container" class="form-container" style="display: none;">
-        <h2>Submit New Coaching</h2>
-
-        <div class="form-group">
-          <label for="coaching-template-select">Select Coaching Template</label>
-          <select id="coaching-template-select" onchange="onCoachingTemplateSelect()">
-            <option value="">-- Select a template --</option>
-          </select>
-        </div>
-
-        <div id="coaching-form-body" style="display: none;">
-          <div class="form-group">
-            <label for="coaching-agent-select">Select User</label>
-            <select id="coaching-agent-select" required></select>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="coaching-session-date">Session Date</label>
-              <input type="date" id="coaching-session-date" required>
-            </div>
-            <div class="form-group">
-              <label for="coaching-week-number">Week Number</label>
-               <input type="text" id="coaching-week-number" readonly>
-            </div>
-          </div>
-
-          <h3>Coaching Form
-            <span id="coaching-overall-score" style="float: right;"></span>
-          </h3>
-          <div id="coaching-form-dynamic">
-            </div>
-
-          <hr class="section-divider">
-
-          <div class="form-group">
-            <label for="coaching-follow-up">Follow-up / Comments</label>
-            <textarea id="coaching-follow-up" rows="4"></textarea>
-           </div>
-
-          <div class="form-group">
-            <label for="coaching-follow-up-date">Follow-up Date (Optional)</label>
-            <input type="date" id="coaching-follow-up-date">
-          </div>
-
-          <button type="button" class="submit-btn-green" onclick="submitNewCoaching()">Submit Coaching</button>
-        </div>
-
-        <div id="coaching-submit-status" class="status-message"></div>
-      </div>
-
-       <div id="coaching-list-container">
-        <div class="coaching-list-header">
-          <h2>My Coaching History</h2>
-          <button type="button" class="export-btn" id="export-coaching-btn" onclick="exportCoachingHistory()">Export History</button>
-        </div>
-        <div id="coaching-list-status" class="status-message"></div>
-        <div id="coaching-list" class="request-list">
-          <p class="text-color-secondary">Your coaching history will appear here.</p>
-        </div>
-       </div>
-
-    </div>
-
-        <div id="coaching-admin-panel" class="tab-panel">
-          <h2>Coaching Template Manager</h2>
           
-          <div class="form-container">
+          <!-- Form Container (Now controlled by JS) -->
+          <div id="coaching-form-container" class="form-container" style="display: none;">
+            <h2>Submit New Coaching</h2>
+            <div class="form-group">
+              <label for="coaching-agent-select">Select User</label>
+              <select id="coaching-agent-select" required></select>
+            </div>
+            <div class="form-group">
+              <label for="coaching-template-select">Select Coaching Template</label>
+              <select id="coaching-template-select" onchange="onCoachingTemplateChange()">
+                <option value="">-- Select a template --</option>
+              </select>
+            </div>
             <div class="form-row">
-              <div class="form-group" style="flex: 2;">
-                <label for="template-select">Load Existing Template</label>
-                <select id="template-select" onchange="onTemplateSelectChange()">
-                  <option value="">-- Load a template to edit --</option>
-                </select>
+              <div class="form-group">
+                <label for="coaching-session-date">Session Date</label>
+                <input type="date" id="coaching-session-date" required>
               </div>
-              <div class="form-group" style="flex: 1;">
-                 <label>&nbsp;</label>
-                 <button type="button" class="submit-btn-green" onclick="createNewTemplate()">Create New Template</button>
+              <div class="form-group">
+                <label for="coaching-week-number">Week Number</label>
+                <input type="text" id="coaching-week-number" readonly>
               </div>
             </div>
-          </div>
-        
-          <hr class="section-divider">
-        
-          <form id="template-builder-form" class="form-container" style="display: none;">
-            <h3>Template Builder</h3>
-            <input type="hidden" id="template-id-input"> <div class="form-group">
-              <label for="template-name-input">Template Name</label>
-              <input type="text" id="template-name-input" placeholder="e.g., 'Weekly Quality Score' or 'Sales Skills'">
-            </div>
-        
-            <div id="template-criteria-builder">
-              <p class="text-color-secondary">Add your first category to begin.</p>
-            </div>
-        
-            <button type="button" style="background-color:var(--konecta-blue)" onclick="addTemplateCategory()">Add Category</button>
-            <hr class="section-divider">
             
-            <div class="form-row">
-              <button type="button" class="submit-btn-green" style="flex: 2;" onclick="saveTemplate()">Save Template</button>
-              <button type="button" class="deny-btn" style="flex: 1;" onclick="deleteTemplate()">Delete Template</button>
+            <!-- Quality Score Section -->
+            <h3>Quality Score
+              <span id="coaching-overall-score" style="float: right;"></span>
+            </h3>
+            <div id="quality-score-form">
+              <!-- JS will populate this -->
             </div>
-        
-          </form>
-        
-          <div id="coaching-admin-status" class="status-message"></div>
-        
-        </div>
+            
+            <hr class="section-divider">
+
+            <div class="form-group">
+              <label for="coaching-follow-up">Follow-up / Comments</label>
+              <textarea id="coaching-follow-up" rows="4"></textarea>
+            </div>
+            
+            <!-- *** NEW: Follow-up Date Input *** -->
+            <div class="form-group">
+              <label for="coaching-follow-up-date">Follow-up Date (Optional)</label>
+              <input type="date" id="coaching-follow-up-date">
+            </div>
+            <!-- ******************************* -->
+            
+            <button type="button" class="submit-btn-green" onclick="submitNewCoaching()">Submit Coaching</button>
+            <div id="coaching-submit-status" class="status-message"></div>
+          </div>
+
+          <!-- List Container -->
+          <div id="coaching-list-container">
+            <!-- *** NEW: Header container for Title and Export Button *** -->
+            <div class="coaching-list-header">
+              <h2>My Coaching History</h2> <!-- Title will be changed by JS -->
+              <button type="button" class="export-btn" id="export-coaching-btn" onclick="exportCoachingHistory()">Export History</button>
+            </div>
+            <!-- ******************************************************* -->
+            
+            <div id="coaching-list-status" class="status-message"></div>
+            <div id="coaching-list" class="request-list">
+              <p class="text-color-secondary">Your coaching history will appear here.</p>
+               </div>
+              </div>
+          </div>
+        <!-- ================================== -->
+        <!--    NEW TAB 10: COACHING PANEL      -->
+        <!-- ================================== -->
+          <div id="coaching-admin-panel" class="tab-panel">
+
+            <h2>Coaching Template Manager</h2>
 
 
-    </div> </main> <!-- End .card -->
+
+            <div class="form-container">
+
+              <div class="form-row">
+
+                <div class="form-group" style="flex: 2;">
+
+                  <label for="template-select">Load Existing Template</label>
+
+                  <select id="template-select" onchange="onTemplateSelectChange()">
+
+                    <option value="">-- Load a template to edit --</option>
+
+                  </select>
+
+                </div>
+
+                <div class="form-group" style="flex: 1;">
+
+                   <label>&nbsp;</label>
+
+                   <button type="button" class="submit-btn-green" onclick="createNewTemplate()">Create New Template</button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+            <hr class="section-divider">
+
+
+
+            <form id="template-builder-form" class="form-container" style="display: none;">
+
+              <h3>Template Builder</h3>
+
+              <input type="hidden" id="template-id-input"> <div class="form-group">
+
+                <label for="template-name-input">Template Name</label>
+
+                <input type="text" id="template-name-input" placeholder="e.g., 'Weekly Quality Score' or 'Sales Skills'">
+
+              </div>
+
+
+
+              <div id="template-criteria-builder">
+
+                <p class="text-color-secondary">Add your first category to begin.</p>
+
+              </div>
+
+
+
+              <button type="button" style="background-color:var(--konecta-blue)" onclick="addTemplateCategory()">Add Category</button>
+
+              <hr class="section-divider">
+
+
+
+              <div class="form-row">
+
+                <button type="button" class="submit-btn-green" style="flex: 2;" onclick="saveTemplate()">Save Template</button>
+
+                <button type="button" class="deny-btn" style="flex: 1;" onclick="deleteTemplate()">Delete Template</button>
+
+              </div>
+
+
+
+            </form>
+
+
+
+            <div id="coaching-admin-status" class="status-message"></div>
+
+
+
+          </div>
+
+
+
+
+
+          </div>
+
+
+          </main>
+          <!-- End .card -->
 
     <!-- MODIFIED: Footer is now positioned by CSS/Flexbox -->
     <footer>
@@ -1716,8 +1805,7 @@
       let allAdminsList = []; 
       let lastHistoryData = null;
       let chartsLoaded = false; 
-      let allTemplates = [];
-      
+      let allTemplates = []; 
       // NEW: Global state for the custom multiselects (History only)
       let selectedHistoryUsers = {};
       let historyUserList = [];
@@ -1858,28 +1946,10 @@
            }
         // ADD THIS NEW BLOCK
         } else if (tabName === 'coaching') {
-  loadMyCoaching();
-
-  // NEW: Load templates into the "Submit" form dropdown
-  const templateSelect = document.getElementById('coaching-template-select');
-  if (templateSelect.options.length <= 1) { // Only load if not already loaded
-    templateSelect.innerHTML = '<option value="">-- Loading templates... --</option>';
-    google.script.run
-      .withSuccessHandler(templates => {
-        templateSelect.innerHTML = '<option value="">-- Select a template --</option>';
-        if (templates && !templates.error) {
-          allTemplates = templates; // Re-sync global state
-          templates.forEach(t => {
-            const option = document.createElement('option');
-            option.value = t.templateID;
-            option.textContent = t.templateName;
-            templateSelect.appendChild(option);
-          });
+          loadMyCoaching(); // <-- Use the new function name
+          
         }
-      })
-      .webGetCoachingTemplates();
-  }
-}
+      }
       
       // --- Refresh User Info ---
       function refreshCurrentData() {
@@ -1892,7 +1962,7 @@
         google.script.run
           .withSuccessHandler(user => {
             populateUserInfo(user); 
-            loadTemplates();
+            
             // Now, reload the data for the specific tab
             if (activeTabName === 'leave-approval') {
               const currentFilter = document.getElementById('filter-mine').classList.contains('active') ? 'mine' : 'all';
@@ -3667,225 +3737,61 @@
       }
 
       /**
- * (REPLACED - PHASE 4)
- * Triggers when user selects a template. Builds the dynamic form.
- */
-function onCoachingTemplateSelect() {
-  const select = document.getElementById('coaching-template-select');
-  const formBody = document.getElementById('coaching-form-body');
-  const formDynamic = document.getElementById('coaching-form-dynamic');
-
-  if (!select.value) {
-    formBody.style.display = 'none';
-    return;
-  }
-
-  const template = allTemplates.find(t => t.templateID === select.value);
-  if (!template) {
-    formBody.style.display = 'none';
-    setStatus('coaching-submit-status', 'error', 'Could not load selected template.');
-    return;
-  }
-
-  // Build the form
-  formDynamic.innerHTML = ''; // Clear old form
-  let currentCategory = '';
-
-  template.criteria.sort((a, b) => a.itemOrder - b.itemOrder);
-
-  template.criteria.forEach(item => {
-    // Create new category header if needed
-    if (item.category !== currentCategory) {
-      currentCategory = item.category;
-      const categoryHeader = document.createElement('div');
-      categoryHeader.className = 'qa-category'; // Use existing style
-      categoryHeader.innerHTML = `<h4>${item.category}</h4>`;
-      formDynamic.appendChild(categoryHeader);
-    }
-
-    // Build the criteria item row
-    const itemContainer = document.createElement('div');
-    itemContainer.className = 'qa-criterion'; // Use existing style
-    itemContainer.innerHTML = `<p>${item.criteriaText}</p>`;
-
-    const inputsContainer = document.createElement('div');
-    inputsContainer.className = 'qa-criterion-inputs';
-
-    let mainInput = '';
-
-    // Create input based on type
-    switch (item.inputType) {
-      case 'score_0-1':
-        mainInput = `
-          <select class="dynamic-score-input" data-itemid="${item.itemID}" data-weight="${item.weight || 1}" onchange="calculateOverallScore()">
-            <option value="null">-- Select --</option>
-            <option value="1">Got It (1)</option>
-            <option value="0.5">Getting There (0.5)</option>
-            <option value="0">Missed It (0)</option>
-          </select>
-        `;
-        break;
-      case 'yes_no':
-        mainInput = `
-          <select class="dynamic-score-input" data-itemid="${item.itemID}" data-weight="1" onchange="calculateOverallScore()">
-            <option value="null">-- Select --</option>
-            <option value="1">Yes</option>
-            <option value="0">No</option>
-          </select>
-        `;
-        break;
-      case 'text_comment':
-        mainInput = `
-          <select class="dynamic-score-input" data-itemid="${item.itemID}" data-weight="0" style="display:none;">
-            <option value="0" selected></option>
-          </select>
-        `; // No score, but we need a comment box
-        break;
-      default:
-        mainInput = `<p>Error: Unknown input type</p>`;
-    }
-
-    // Add the comment box (unless it's 'text_comment', which ONLY gets a big box)
-    if (item.inputType === 'text_comment') {
-      inputsContainer.innerHTML = `
-        ${mainInput}
-        <textarea class="dynamic-comment-input" data-itemid="${item.itemID}" placeholder="Enter comments..." style="flex: 1; height: 60px;"></textarea>
-      `;
-    } else {
-      inputsContainer.innerHTML = `
-        ${mainInput}
-        <textarea class="dynamic-comment-input" data-itemid="${item.itemID}" placeholder="Enter comments..."></textarea>
-      `;
-    }
-
-    itemContainer.appendChild(inputsContainer);
-    formDynamic.appendChild(itemContainer);
-  });
-
-  // Show the form and reset score
-  formBody.style.display = 'block';
-  calculateOverallScore();
-}
-
-/**
- * (REPLACED - PHASE 4)
- * Calculates score from the new dynamic form.
- */
-function calculateOverallScore() {
-  const scoreInputs = document.querySelectorAll('#coaching-form-dynamic .dynamic-score-input');
-  const scoreSpan = document.getElementById('coaching-overall-score');
-
-  let totalScore = 0;
-  let totalPossible = 0;
-
-  scoreInputs.forEach(select => {
-    const value = parseFloat(select.value);
-    const weight = parseFloat(select.dataset.weight || 1);
-
-    if (weight > 0 && value !== null && !isNaN(value)) {
-      totalScore += value;
-      totalPossible += weight; // Each item is worth its weight
-    }
-  });
-
-  if (totalPossible === 0) {
-    scoreSpan.textContent = 'N/A';
-    return 0; // Return 0%
-  } else {
-    const percentage = (totalScore / totalPossible) * 100;
-    scoreSpan.textContent = `${percentage.toFixed(2)}%`;
-    return percentage;
-  }
-}
-
-/**
- * (REPLACED - PHASE 4)
- * Submits the new DYNAMIC coaching session.
- */
-function submitNewCoaching() {
-  try {
-    // Get template and user data
-    const templateID = document.getElementById('coaching-template-select').value;
-    if (!templateID) throw new Error("Please select a coaching template.");
-
-    const agentSelect = document.getElementById('coaching-agent-select');
-    const selectedEmail = agentSelect.value;
-    if (!selectedEmail) throw new Error("Please select an agent.");
-
-    const sessionDate = document.getElementById('coaching-session-date').value;
-    if (!sessionDate) throw new Error("Please select a session date.");
-
-    const weekNumber = document.getElementById('coaching-week-number').value;
-    const followUpComment = document.getElementById('coaching-follow-up').value;
-    const followUpDate = document.getElementById('coaching-follow-up-date').value;
-
-    // Calculate final score
-    const overallScore = calculateOverallScore();
-
-    // Gather all scores
-    const scores = [];
-    const scoreInputs = document.querySelectorAll('#coaching-form-dynamic .dynamic-score-input');
-
-    scoreInputs.forEach(input => {
-      const itemID = input.dataset.itemid;
-      const scoreValue = input.value === 'null' ? null : input.value;
-
-      // Find the matching comment box
-      const commentInput = document.querySelector(`.dynamic-comment-input[data-itemid="${itemID}"]`);
-      const commentText = commentInput ? commentInput.value : '';
-
-      // Only save if a score was selected OR a comment was written
-      if (scoreValue !== null || commentText) {
-         scores.push({
-          itemID: itemID,
-          scoreValue: scoreValue,
-          commentText: commentText
+       * Dynamically builds the QA form from the category data.
+       */
+      function buildQualityForm() {
+        const formDiv = document.getElementById('quality-score-form');
+        if (!formDiv) return;
+        
+        let html = '';
+        qualityCategories.forEach((cat, catIndex) => {
+          html += `<div class="qa-category"><h4>${cat.category}</h4>`;
+          
+          cat.criteria.forEach((crit, critIndex) => {
+            html += `
+              <div class="qa-criterion">
+                <p>${crit}</p>
+                <div class="qa-criterion-inputs">
+                  <select id="qa-score-${catIndex}-${critIndex}" onchange="calculateOverallScore()">
+                    ${scoreOptions.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
+                  </select>
+                  <textarea id="qa-comment-${catIndex}-${critIndex}" placeholder="Enter comments..."></textarea>
+                </div>
+              </div>
+            `;
+          });
+          html += `</div>`;
         });
+        formDiv.innerHTML = html;
       }
-    });
 
-    const sessionObject = {
-      templateID: templateID,
-      agentEmail: selectedEmail,
-      sessionDate: sessionDate,
-      weekNumber: weekNumber,
-      scores: scores,
-      followUpComment: followUpComment,
-      overallScore: overallScore,
-      followUpDate: followUpDate || null 
-    };
-
-    setStatus('coaching-submit-status', 'processing', `Saving session for ${agentSelect.options[agentSelect.selectedIndex].text}...`);
-
-    google.script.run
-      .withSuccessHandler(msg => {
-        if (msg.startsWith('Error:')) {
-          setStatus('coaching-submit-status', 'error', msg.replace('Error: ', ''));
+      /**
+       * Calculates and displays the overall QA score.
+       */
+      function calculateOverallScore() {
+        let totalScore = 0;
+        let totalPossible = 0;
+        
+        qualityCategories.forEach((cat, catIndex) => {
+          cat.criteria.forEach((crit, critIndex) => {
+            const scoreSelect = document.getElementById(`qa-score-${catIndex}-${critIndex}`);
+            if (scoreSelect && scoreSelect.value !== "null") {
+              totalScore += parseFloat(scoreSelect.value);
+              totalPossible += 1; // Each item is worth 1 point max
+            }
+          });
+        });
+        
+        const scoreSpan = document.getElementById('coaching-overall-score');
+        if (totalPossible === 0) {
+          scoreSpan.textContent = 'N/A';
+          return { score: 0, possible: 0, percentage: 0 };
         } else {
-          setStatus('coaching-submit-status', 'success', msg);
-
-          // Reset form
-          document.getElementById('coaching-template-select').value = '';
-          document.getElementById('coaching-form-body').style.display = 'none';
-          document.getElementById('coaching-form-dynamic').innerHTML = '';
-          document.getElementById('coaching-agent-select').selectedIndex = 0;
-          document.getElementById('coaching-follow-up').value = '';
-          document.getElementById('coaching-follow-up-date').value = '';
-          document.getElementById('coaching-session-date').valueAsDate = new Date();
-          updateWeekNumber();
-
-          loadMyCoaching(); // Refresh the history list
+          const percentage = (totalScore / totalPossible) * 100;
+          scoreSpan.textContent = `${percentage.toFixed(2)}%`;
+          return { score: totalScore, possible: totalPossible, percentage: percentage };
         }
-      })
-      .withFailureHandler(err => {
-        setStatus('coaching-submit-status', 'error', err.message);
-      })
-      .webSubmitCoaching(sessionObject);
-
-  } catch (err) {
-    setStatus('coaching-submit-status', 'error', err.message);
-  }
-}
+      }
 
       /**
        * Called when the 'Coaching' tab is clicked.
@@ -3967,19 +3873,20 @@ function submitNewCoaching() {
       }
       
       /**
-       * *** NEW: Export Coaching History (Summary) ***
-       */
-      function exportCoachingHistory() {
-    if (!lastCoachingData || lastCoachingData.length === 0) {
+     * *** NEW: Export Coaching History (Summary) ***
+     * *** MODIFIED FOR POINT 6 (Coaching Export) ***
+     */
+     function exportCoachingHistory() {
+     if (!lastCoachingData || lastCoachingData.length === 0) {
       setStatus('coaching-list-status', 'error', "No data to export.");
       return;
-    }
+     }
 
-    let csvContent = "data:text/csv;charset=utf-8,";
-    // New headers for detailed export
-    csvContent += "SessionID,AgentName,CoachName,SessionDate,WeekNumber,OverallScore,FollowUpComment,FollowUpDate,FollowUpStatus,Score_Category,Score_Criteria,Score_Value,Score_Comment\r\n";
+     let csvContent = "data:text/csv;charset=utf-8,";
+     // New headers for detailed export
+     csvContent += "SessionID,AgentName,CoachName,SessionDate,WeekNumber,OverallScore,FollowUpComment,FollowUpDate,FollowUpStatus,Score_Category,Score_Criteria,Score_Value,Score_Comment\r\n";
 
-    lastCoachingData.forEach(session => {
+     lastCoachingData.forEach(session => {
       // Escape commas and quotes in comments
       const followUpComment = `"${(session.followUpComment || "").replace(/"/g, '""')}"`;
 
@@ -3996,345 +3903,441 @@ function submitNewCoaching() {
         session.followUpStatus || 'N/A'
       ];
 
-     if (session.scores && session.scores.length > 0) {
-        // Create a new row for each detailed score
-        session.scores.forEach(score => {
-            // *** FIX: Use new property names ***
-            const scoreComment = `"${(score.commentText || "").replace(/"/g, '""')}"`;
-            const detailRow = [
-                score.category,
-                `"${(score.criteriaText || "").replace(/"/g, '""')}"`, 
-                score.scoreValue,
-                scoreComment
-            ];
-            csvContent += baseRow.join(",") + "," + detailRow.join(",") + "\r\n";
-        });
+      if (session.scores && session.scores.length > 0) {
+        // Create a new row for each detailed score
+        session.scores.forEach(score => {
+            const scoreComment = `"${(score.comment || "").replace(/"/g, '""')}"`;
+            const detailRow = [
+                score.category,
+                `"${(score.criteria || "").replace(/"/g, '""')}"`, // Add quotes to handle commas in criteria
+                score.score,
+                scoreComment
+            ];
+            csvContent += baseRow.join(",") + "," + detailRow.join(",") + "\r\n";
+        });
       } else {
         // If no detailed scores, just log the session summary
         csvContent += baseRow.join(",") + ",N/A,N/A,N/A,N/A\r\n";
       }
-    });
+      });
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Coaching_History_Detailed_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link); 
-    link.click();
-    document.body.removeChild(link);
-  }
+     const encodedUri = encodeURI(csvContent);
+     const link = document.createElement("a");
+     link.setAttribute("href", encodedUri);
+     link.setAttribute("download", `Coaching_History_Detailed_${new Date().toISOString().split('T')[0]}.csv`);
+     document.body.appendChild(link); 
+     link.click();
+     document.body.removeChild(link);
+     }
 
-      
-      
-      // --- END Coaching Functions ---
+      /**
+       * Submits the new coaching session form.
+       */
+      function submitNewCoaching() {
+        try {
+          // Get user data
+          const agentSelect = document.getElementById('coaching-agent-select');
+          const selectedEmail = agentSelect.value;
+          
+          if (!selectedEmail) throw new Error("Please select an agent.");
+          
+          const sessionDate = document.getElementById('coaching-session-date').value;
+          if (!sessionDate) throw new Error("Please select a session date.");
+          
+          const weekNumber = document.getElementById('coaching-week-number').value;
+          const followUpComment = document.getElementById('coaching-follow-up').value;
+          // *** NEW: Get follow-up date ***
+          const followUpDate = document.getElementById('coaching-follow-up-date').value;
+
+          // Gather scores
+          const scores = [];
+          qualityCategories.forEach((cat, catIndex) => {
+            cat.criteria.forEach((crit, critIndex) => {
+              const score = document.getElementById(`qa-score-${catIndex}-${critIndex}`).value;
+              const comment = document.getElementById(`qa-comment-${catIndex}-${critIndex}`).value;
+              
+              // Only save if a score was selected
+              if (score !== "null") {
+                scores.push({
+                  category: cat.category,
+                  criteria: crit,
+                  score: parseFloat(score),
+                  comment: comment
+                });
+              }
+            });
+          });
+
+          // Calculate final score
+          const { percentage } = calculateOverallScore();
+
+          const sessionObject = {
+            agentEmail: selectedEmail,
+            sessionDate: sessionDate,
+            weekNumber: weekNumber,
+            scores: scores,
+            followUpComment: followUpComment,
+            overallScore: percentage,
+            // *** NEW: Add follow-up date to object ***
+            followUpDate: followUpDate || null 
+          };
+          
+          setStatus('coaching-submit-status', 'processing', `Saving session for ${agentSelect.options[agentSelect.selectedIndex].text}...`);
+          
+          google.script.run
+            .withSuccessHandler(msg => {
+              if (msg.startsWith('Error:')) {
+                setStatus('coaching-submit-status', 'error', msg.replace('Error: ', ''));
+              } else {
+                setStatus('coaching-submit-status', 'success', msg);
+                // Reset form
+                // Use .reset() on the parent form element, if it exists
+                const form = document.getElementById('coaching-form-container');
+                if (form && typeof form.reset === 'function') {
+                    form.reset();
+                } else {
+                    // Manual reset as fallback
+                    document.getElementById('coaching-agent-select').selectedIndex = 0;
+                    document.getElementById('coaching-follow-up').value = '';
+                    document.getElementById('coaching-follow-up-date').value = '';
+                }
+                
+                document.getElementById('coaching-session-date').valueAsDate = new Date();
+                updateWeekNumber();
+                buildQualityForm(); // Re-builds the form, clearing it
+                calculateOverallScore(); // Resets score display
+                loadMyCoaching(); // Refresh the history list
+              }
+            })
+            .withFailureHandler(err => {
+              setStatus('coaching-submit-status', 'error', err.message);
+            })
+            .webSubmitCoaching(sessionObject);
+
+        } catch (err) {
+          setStatus('coaching-submit-status', 'error', err.message);
+        }
+      }
       // ==========================================================
-// === NEW COACHING TEMPLATE FUNCTIONS (PHASE 3) ===
-// ==========================================================
+      // === NEW COACHING TEMPLATE FUNCTIONS (PHASE 3) ===
+      // ==========================================================
+      function populateTemplateDropdown(templates) {
+        const templateSelect = document.getElementById('coaching-template-select');
+        if (!templateSelect) return; // Safety check
 
-/**
- * Called when the "Coaching Admin" tab is shown, or on page load
- */
-function loadTemplates() {
-  setStatus('coaching-admin-status', 'processing', 'Loading templates...');
-  google.script.run
-    .withSuccessHandler(templates => {
-      if (templates.error) {
-        setStatus('coaching-admin-status', 'error', templates.error);
-        return;
-      }
-
-      allTemplates = templates; // Save to global state
-      const select = document.getElementById('template-select');
-      select.innerHTML = '<option value="">-- Load a template to edit --</option>'; // Reset
-
-      templates.forEach(t => {
-        const option = document.createElement('option');
-        option.value = t.templateID;
-        option.textContent = t.templateName;
-        select.appendChild(option);
-      });
-
-      setStatus('coaching-admin-status', '', ''); // Clear status
-    })
-    .withFailureHandler(err => {
-      setStatus('coaching-admin-status', 'error', err.message);
-    })
-    .webGetCoachingTemplates();
-}
-
-/**
- * Clears the form and shows it to create a new template
- */
-function createNewTemplate() {
-  document.getElementById('template-builder-form').style.display = 'block';
-  document.getElementById('template-id-input').value = '';
-  document.getElementById('template-name-input').value = '';
-  document.getElementById('template-criteria-builder').innerHTML = '<p class="text-color-secondary">Add your first category to begin.</p>';
-  document.getElementById('template-select').value = '';
-}
-
-/**
- * Called when the <select> dropdown is changed
- */
-function onTemplateSelectChange() {
-  const select = document.getElementById('template-select');
-  const templateID = select.value;
-  if (!templateID) {
-    document.getElementById('template-builder-form').style.display = 'none';
-    return;
-  }
-
-  const template = allTemplates.find(t => t.templateID === templateID);
-  if (template) {
-    renderTemplateForEditing(template);
-  }
-}
-
-/**
- * Fills the builder form with the data from a loaded template
- */
-function renderTemplateForEditing(template) {
-  document.getElementById('template-builder-form').style.display = 'block';
-  document.getElementById('template-id-input').value = template.templateID;
-  document.getElementById('template-name-input').value = template.templateName;
-
-  const builder = document.getElementById('template-criteria-builder');
-  builder.innerHTML = ''; // Clear it
-
-  if (!template.criteria || template.criteria.length === 0) {
-    builder.innerHTML = '<p class="text-color-secondary">This template is empty. Add a category to begin.</p>';
-    return;
-  }
-
-  let currentCategory = '';
-  let categoryContainer = null;
-
-  // Sort criteria by itemOrder to ensure they render correctly
-  template.criteria.sort((a, b) => a.itemOrder - b.itemOrder);
-
-  template.criteria.forEach(item => {
-    // If this is a new category, create the category container
-    if (item.category !== currentCategory) {
-      currentCategory = item.category;
-      categoryContainer = document.createElement('div');
-      categoryContainer.className = 'qa-category template-category'; // Use existing styles
-      categoryContainer.innerHTML = `
-        <div class="form-row" style="align-items: center;">
-          <div class="form-group" style="flex: 1;">
-            <label>Category Name</label>
-            <input type="text" class="template-category-name" value="${item.category}">
-          </div>
-          <button type="button" class="deny-btn" onclick="removeTemplateItem(this)" style="margin-top: 10px;">Remove Category</button>
-        </div>
-        <div class="template-criteria-list">
-          </div>
-        <button type="button" class="submit-btn-green" style="font-size: 14px; padding: 8px 12px; margin-top: 10px;" onclick="addTemplateCriteria(this)">+ Add Criteria</button>
-      `;
-      builder.appendChild(categoryContainer);
-    }
-
-    // Add the criteria row to the current category container
-    const criteriaList = categoryContainer.querySelector('.template-criteria-list');
-    const criteriaRow = document.createElement('div');
-    criteriaRow.className = 'form-row template-criteria-item';
-    criteriaRow.style.alignItems = 'flex-end';
-    criteriaRow.innerHTML = `
-      <div class="form-group" style="flex: 3;">
-        <label>Criteria Text</label>
-        <input type="text" class="template-criteria-text" value="${item.criteriaText}">
-      </div>
-      <div class="form-group" style="flex: 1;">
-        <label>Input Type</label>
-        <select class="template-criteria-type">
-          <option value="score_0-1" ${item.inputType === 'score_0-1' ? 'selected' : ''}>Score (0, 0.5, 1)</option>
-          <option value="yes_no" ${item.inputType === 'yes_no' ? 'selected' : ''}>Yes / No</option>
-          <option value="text_comment" ${item.inputType === 'text_comment' ? 'selected' : ''}>Comment Only</option>
-        </select>
-      </div>
-      <button type="button" class="deny-btn" onclick="removeTemplateItem(this)" style="margin-bottom: 10px; padding: 10px;">X</button>
-    `;
-    criteriaList.appendChild(criteriaRow);
-  });
-}
-
-
-/**
- * Adds a new blank category container to the builder
- */
-function addTemplateCategory() {
-  const builder = document.getElementById('template-criteria-builder');
-
-  // Clear placeholder text if it exists
-  if (builder.querySelector('p')) {
-    builder.innerHTML = '';
-  }
-
-  const categoryContainer = document.createElement('div');
-  categoryContainer.className = 'qa-category template-category'; // Use existing styles
-  categoryContainer.innerHTML = `
-    <div class="form-row" style="align-items: center;">
-      <div class="form-group" style="flex: 1;">
-        <label>Category Name</label>
-        <input type="text" class="template-category-name" placeholder="e.g., 'Opening' or 'Solution'">
-      </div>
-      <button type="button" class="deny-btn" onclick="removeTemplateItem(this)" style="margin-top: 10px;">Remove Category</button>
-    </div>
-    <div class="template-criteria-list">
-      </div>
-    <button type="button" class="submit-btn-green" style="font-size: 14px; padding: 8px 12px; margin-top: 10px;" onclick="addTemplateCriteria(this)">+ Add Criteria</button>
-  `;
-  builder.appendChild(categoryContainer);
-}
-
-/**
- * Adds a new blank criteria row to the category
- */
-function addTemplateCriteria(buttonElement) {
-  const criteriaList = buttonElement.closest('.template-category').querySelector('.template-criteria-list');
-
-  const criteriaRow = document.createElement('div');
-  criteriaRow.className = 'form-row template-criteria-item';
-  criteriaRow.style.alignItems = 'flex-end';
-  criteriaRow.innerHTML = `
-    <div class="form-group" style="flex: 3;">
-      <label>Criteria Text</label>
-      <input type="text" class="template-criteria-text" placeholder="e.g., 'Agent greeted customer'">
-    </div>
-    <div class="form-group" style="flex: 1;">
-      <label>Input Type</label>
-      <select class="template-criteria-type">
-        <option value="score_0-1">Score (0, 0.5, 1)</option>
-        <option value="yes_no">Yes / No</option>
-        <option value="text_comment">Comment Only</option>
-      </select>
-    </div>
-    <button type="button" class="deny-btn" onclick="removeTemplateItem(this)" style="margin-bottom: 10px; padding: 10px;">X</button>
-  `;
-  criteriaList.appendChild(criteriaRow);
-}
-
-/**
- * Removes a Category or Criteria item
- */
-function removeTemplateItem(buttonElement) {
-  // Find the parent item to remove (either a category or a criteria row)
-  const itemToRemove = buttonElement.closest('.template-category, .template-criteria-item');
-  if (itemToRemove) {
-    itemToRemove.remove();
-  }
-}
-
-/**
- * Reads the entire builder form and saves the template
- */
-function saveTemplate() {
-  try {
-    const templateID = document.getElementById('template-id-input').value;
-    const templateName = document.getElementById('template-name-input').value;
-
-    if (!templateName) {
-      throw new Error("Template Name is required.");
-    }
-
-    const templateObject = {
-      templateID: templateID || null,
-      templateName: templateName,
-      criteria: []
-    };
-
-    const categories = document.querySelectorAll('.template-category');
-    if (categories.length === 0) {
-      throw new Error("Template must have at least one category.");
-    }
-
-    categories.forEach(categoryEl => {
-      const categoryName = categoryEl.querySelector('.template-category-name').value;
-      if (!categoryName) {
-        throw new Error("All categories must have a name.");
-      }
-
-      const criteriaItems = categoryEl.querySelectorAll('.template-criteria-item');
-      if (criteriaItems.length === 0) {
-        throw new Error(`Category "${categoryName}" must have at least one criteria item.`);
-      }
-
-      criteriaItems.forEach(criteriaEl => {
-        const criteriaText = criteriaEl.querySelector('.template-criteria-text').value;
-        const inputType = criteriaEl.querySelector('.template-criteria-type').value;
-
-        if (!criteriaText) {
-          throw new Error(`Found an empty criteria text in category "${categoryName}".`);
-        }
-
-        templateObject.criteria.push({
-          category: categoryName,
-          criteriaText: criteriaText,
-          inputType: inputType,
-          weight: 1 // We can add this to the UI later if needed
+        templateSelect.innerHTML = '<option value="">-- Select a template --</option>';
+        templates.forEach(t => {
+          const option = document.createElement('option');
+          option.value = t.templateID;
+          option.textContent = t.templateName;
+          templateSelect.appendChild(option);
         });
-      });
-    });
-
-    // Now we have the full object, send it to the server
-    setStatus('coaching-admin-status', 'processing', 'Saving template...');
-    google.script.run
-      .withSuccessHandler(result => {
-        if (result.error) {
-          setStatus('coaching-admin-status', 'error', result.error);
-        } else {
-          setStatus('coaching-admin-status', 'success', `Template "${result.name}" saved successfully.`);
-          document.getElementById('template-builder-form').style.display = 'none';
-          loadTemplates(); // Reload the dropdown
-        }
-      })
-      .withFailureHandler(err => {
-        setStatus('coaching-admin-status', 'error', err.message);
-      })
-      .webSaveCoachingTemplate(templateObject);
-
-  } catch (err) {
-    setStatus('coaching-admin-status', 'error', err.message);
-  }
-}
-
-/**
- * Deletes (archives) the currently loaded template
- */
-function deleteTemplate() {
-  const templateID = document.getElementById('template-id-input').value;
-  const templateName = document.getElementById('template-name-input').value;
-
-  if (!templateID) {
-    setStatus('coaching-admin-status', 'error', 'No template loaded to delete.');
-    return;
-  }
-
-  if (!confirm(`Are you sure you want to delete the template "${templateName}"? This cannot be undone.`)) {
-    return;
-  }
-
-  setStatus('coaching-admin-status', 'processing', 'Deleting template...');
-  google.script.run
-    .withSuccessHandler(result => {
-      if (result.error) {
-        setStatus('coaching-admin-status', 'error', result.error);
-      } else {
-        setStatus('coaching-admin-status', 'success', `Template "${templateName}" deleted.`);
-        document.getElementById('template-builder-form').style.display = 'none';
-        loadTemplates(); // Reload the dropdown
       }
-    })
-    .withFailureHandler(err => {
-      setStatus('coaching-admin-status', 'error', err.message);
-    })
-    .webDeleteCoachingTemplate(templateID);
-}    
+      /**
+       * Called when the "Coaching Admin" tab is shown, or on page load
+       */
+      function loadTemplates() {
+        setStatus('coaching-admin-status', 'processing', 'Loading templates...');
+        google.script.run
+          .withSuccessHandler(templates => {
+            if (templates.error) {
+              setStatus('coaching-admin-status', 'error', templates.error);
+              return;
+            }
+
+            allTemplates = templates; // Save to global state
+            const select = document.getElementById('template-select');
+            select.innerHTML = '<option value="">-- Load a template to edit --</option>'; // Reset
+
+            templates.forEach(t => {
+              const option = document.createElement('option');
+              option.value = t.templateID;
+              option.textContent = t.templateName;
+              select.appendChild(option);
+            });
+
+            setStatus('coaching-admin-status', '', ''); // Clear status
+          })
+          .withFailureHandler(err => {
+            setStatus('coaching-admin-status', 'error', err.message);
+          })
+          .webGetCoachingTemplates();
+      }
+
+      /**
+       * Clears the form and shows it to create a new template
+       */
+      function createNewTemplate() {
+        document.getElementById('template-builder-form').style.display = 'block';
+        document.getElementById('template-id-input').value = '';
+        document.getElementById('template-name-input').value = '';
+        document.getElementById('template-criteria-builder').innerHTML = '<p class="text-color-secondary">Add your first category to begin.</p>';
+        document.getElementById('template-select').value = '';
+      }
+
+      /**
+       * Called when the <select> dropdown is changed
+       */
+      function onTemplateSelectChange() {
+        const select = document.getElementById('template-select');
+        const templateID = select.value;
+        if (!templateID) {
+          document.getElementById('template-builder-form').style.display = 'none';
+          return;
+        }
+
+        const template = allTemplates.find(t => t.templateID === templateID);
+        if (template) {
+          renderTemplateForEditing(template);
+        }
+      }
+
+      /**
+       * Fills the builder form with the data from a loaded template
+       */
+      function renderTemplateForEditing(template) {
+        document.getElementById('template-builder-form').style.display = 'block';
+        document.getElementById('template-id-input').value = template.templateID;
+        document.getElementById('template-name-input').value = template.templateName;
+      
+        const builder = document.getElementById('template-criteria-builder');
+        builder.innerHTML = ''; // Clear it
+      
+        if (!template.criteria || template.criteria.length === 0) {
+          builder.innerHTML = '<p class="text-color-secondary">This template is empty. Add a category to begin.</p>';
+          return;
+        }
+
+        let currentCategory = '';
+        let categoryContainer = null;
+
+        // Sort criteria by itemOrder to ensure they render correctly
+        template.criteria.sort((a, b) => a.itemOrder - b.itemOrder);
+
+        template.criteria.forEach(item => {
+          // If this is a new category, create the category container
+          if (item.category !== currentCategory) {
+            currentCategory = item.category;
+            categoryContainer = document.createElement('div');
+            categoryContainer.className = 'qa-category template-category'; // Use existing styles
+            categoryContainer.innerHTML = `
+              <div class="form-row" style="align-items: center;">
+                <div class="form-group" style="flex: 1;">
+                  <label>Category Name</label>
+                  <input type="text" class="template-category-name" value="${item.category}">
+                </div>
+                <button type="button" class="deny-btn" onclick="removeTemplateItem(this)" style="margin-top: 10px;">Remove Category</button>
+              </div>
+              <div class="template-criteria-list">
+                </div>
+              <button type="button" class="submit-btn-green" style="font-size: 14px; padding: 8px 12px; margin-top: 10px;" onclick="addTemplateCriteria(this)">+ Add Criteria</button>
+            `;
+            builder.appendChild(categoryContainer);
+          }
+
+          // Add the criteria row to the current category container
+          const criteriaList = categoryContainer.querySelector('.template-criteria-list');
+          const criteriaRow = document.createElement('div');
+          criteriaRow.className = 'form-row template-criteria-item';
+          criteriaRow.style.alignItems = 'flex-end';
+          criteriaRow.innerHTML = `
+            <div class="form-group" style="flex: 3;">
+              <label>Criteria Text</label>
+              <input type="text" class="template-criteria-text" value="${item.criteriaText}">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>Input Type</label>
+              <select class="template-criteria-type">
+                <option value="score_0-1" ${item.inputType === 'score_0-1' ? 'selected' : ''}>Score (0, 0.5, 1)</option>
+                <option value="yes_no" ${item.inputType === 'yes_no' ? 'selected' : ''}>Yes / No</option>
+                <option value="text_comment" ${item.inputType === 'text_comment' ? 'selected' : ''}>Comment Only</option>
+              </select>
+            </div>
+            <button type="button" class="deny-btn" onclick="removeTemplateItem(this)" style="margin-bottom: 10px; padding: 10px;">X</button>
+          `;
+          criteriaList.appendChild(criteriaRow);
+        });
+      }
+
+
+      /**
+       * Adds a new blank category container to the builder
+       */
+      function addTemplateCategory() {
+        const builder = document.getElementById('template-criteria-builder');
+
+        // Clear placeholder text if it exists
+        if (builder.querySelector('p')) {
+          builder.innerHTML = '';
+        }
+
+        const categoryContainer = document.createElement('div');
+        categoryContainer.className = 'qa-category template-category'; // Use existing styles
+        categoryContainer.innerHTML = `
+          <div class="form-row" style="align-items: center;">
+            <div class="form-group" style="flex: 1;">
+              <label>Category Name</label>
+              <input type="text" class="template-category-name" placeholder="e.g., 'Opening' or 'Solution'">
+            </div>
+            <button type="button" class="deny-btn" onclick="removeTemplateItem(this)" style="margin-top: 10px;">Remove Category</button>
+          </div>
+          <div class="template-criteria-list">
+            </div>
+          <button type="button" class="submit-btn-green" style="font-size: 14px; padding: 8px 12px; margin-top: 10px;" onclick="addTemplateCriteria(this)">+ Add Criteria</button>
+        `;
+        builder.appendChild(categoryContainer);
+      }
+
+      /**
+       * Adds a new blank criteria row to the category
+       */
+      function addTemplateCriteria(buttonElement) {
+        const criteriaList = buttonElement.closest('.template-category').querySelector('.template-criteria-list');
+
+        const criteriaRow = document.createElement('div');
+        criteriaRow.className = 'form-row template-criteria-item';
+        criteriaRow.style.alignItems = 'flex-end';
+        criteriaRow.innerHTML = `
+          <div class="form-group" style="flex: 3;">
+            <label>Criteria Text</label>
+            <input type="text" class="template-criteria-text" placeholder="e.g., 'Agent greeted customer'">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Input Type</label>
+            <select class="template-criteria-type">
+              <option value="score_0-1">Score (0, 0.5, 1)</option>
+              <option value="yes_no">Yes / No</option>
+              <option value="text_comment">Comment Only</option>
+            </select>
+          </div>
+          <button type="button" class="deny-btn" onclick="removeTemplateItem(this)" style="margin-bottom: 10px; padding: 10px;">X</button>
+        `;
+        criteriaList.appendChild(criteriaRow);
+      }
+
+      /**
+       * Removes a Category or Criteria item
+       */
+      function removeTemplateItem(buttonElement) {
+        // Find the parent item to remove (either a category or a criteria row)
+        const itemToRemove = buttonElement.closest('.template-category, .template-criteria-item');
+        if (itemToRemove) {
+          itemToRemove.remove();
+        }
+      }
+
+      /**
+       * Reads the entire builder form and saves the template
+       */
+      function saveTemplate() {
+        try {
+          const templateID = document.getElementById('template-id-input').value;
+          const templateName = document.getElementById('template-name-input').value;
+
+          if (!templateName) {
+            throw new Error("Template Name is required.");
+          }
+
+          const templateObject = {
+            templateID: templateID || null,
+            templateName: templateName,
+            criteria: []
+          };
+
+          const categories = document.querySelectorAll('.template-category');
+          if (categories.length === 0) {
+            throw new Error("Template must have at least one category.");
+          }
+
+          categories.forEach(categoryEl => {
+            const categoryName = categoryEl.querySelector('.template-category-name').value;
+            if (!categoryName) {
+              throw new Error("All categories must have a name.");
+            }
+
+            const criteriaItems = categoryEl.querySelectorAll('.template-criteria-item');
+            if (criteriaItems.length === 0) {
+              throw new Error(`Category "${categoryName}" must have at least one criteria item.`);
+            }
+
+            criteriaItems.forEach(criteriaEl => {
+              const criteriaText = criteriaEl.querySelector('.template-criteria-text').value;
+              const inputType = criteriaEl.querySelector('.template-criteria-type').value;
+
+              if (!criteriaText) {
+                throw new Error(`Found an empty criteria text in category "${categoryName}".`);
+              }
+
+              templateObject.criteria.push({
+                category: categoryName,
+                criteriaText: criteriaText,
+                inputType: inputType,
+                weight: 1 // We can add this to the UI later if needed
+              });
+            });
+          });
+
+          // Now we have the full object, send it to the server
+          setStatus('coaching-admin-status', 'processing', 'Saving template...');
+          google.script.run
+            .withSuccessHandler(result => {
+              if (result.error) {
+                setStatus('coaching-admin-status', 'error', result.error);
+              } else {
+                setStatus('coaching-admin-status', 'success', `Template "${result.name}" saved successfully.`);
+                document.getElementById('template-builder-form').style.display = 'none';
+                loadTemplates(); // Reload the dropdown
+              }
+            })
+            .withFailureHandler(err => {
+              setStatus('coaching-admin-status', 'error', err.message);
+            })
+            .webSaveCoachingTemplate(templateObject);
+
+        } catch (err) {
+          setStatus('coaching-admin-status', 'error', err.message);
+        }
+      }
+
+      /**
+       * Deletes (archives) the currently loaded template
+       */
+      function deleteTemplate() {
+        const templateID = document.getElementById('template-id-input').value;
+        const templateName = document.getElementById('template-name-input').value;
+
+        if (!templateID) {
+          setStatus('coaching-admin-status', 'error', 'No template loaded to delete.');
+          return;
+        }
+
+        if (!confirm(`Are you sure you want to delete the template "${templateName}"? This cannot be undone.`)) {
+          return;
+        }
+
+        setStatus('coaching-admin-status', 'processing', 'Deleting template...');
+        google.script.run
+          .withSuccessHandler(result => {
+            if (result.error) {
+              setStatus('coaching-admin-status', 'error', result.error);
+            } else {
+              setStatus('coaching-admin-status', 'success', `Template "${templateName}" deleted.`);
+              document.getElementById('template-builder-form').style.display = 'none';
+              loadTemplates(); // Reload the dropdown
+            }
+          })
+          .withFailureHandler(err => {
+            setStatus('coaching-admin-status', 'error', err.message);
+          })
+          .webDeleteCoachingTemplate(templateID);
+      }
+      // --- END Coaching Functions ---
 
 
       // Initialize
       document.addEventListener("DOMContentLoaded", function() {
         loadUserInfo(); 
-        
+        loadTemplates();
         document.getElementById('schedule-start-date').valueAsDate = new Date();
         document.getElementById('leave-start-date').valueAsDate = new Date();
         document.getElementById('history-start-date').valueAsDate = new Date(); 
@@ -4346,9 +4349,9 @@ function deleteTemplate() {
         // NEW: Coaching form init
         document.getElementById('coaching-session-date').valueAsDate = new Date();
         document.getElementById('coaching-session-date').addEventListener('change', updateWeekNumber);
-        
+        buildQualityForm();
         updateWeekNumber();
-        
+        calculateOverallScore();
 
         toggleTimeFields();
       });
