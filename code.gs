@@ -2137,7 +2137,14 @@ function webGetCoachingTemplates() {
     };
     
     // 2. Get all criteria from the sheet and map them by TemplateID
-    const criteriaData = criteriaSheet.getRange(2, 1, criteriaSheet.getLastRow() - 1, 7).getValues();
+    
+    // --- THIS IS THE FIX ---
+    let criteriaData = [];
+    if (criteriaSheet.getLastRow() > 1) { // Check if there's more than just the header
+      criteriaData = criteriaSheet.getRange(2, 1, criteriaSheet.getLastRow() - 1, 7).getValues();
+    }
+    // --- END FIX ---
+
     const criteriaMap = {};
     for (let i = 0; i < criteriaData.length; i++) {
       const row = criteriaData[i];
@@ -2156,7 +2163,14 @@ function webGetCoachingTemplates() {
     }
 
     // 3. Get all templates from the sheet and attach their criteria
-    const templateData = templateSheet.getRange(2, 1, templateSheet.getLastRow() - 1, 5).getValues();
+    
+    // --- THIS IS THE FIX ---
+    let templateData = [];
+    if (templateSheet.getLastRow() > 1) { // Check if there's more than just the header
+      templateData = templateSheet.getRange(2, 1, templateSheet.getLastRow() - 1, 5).getValues();
+    }
+    // --- END FIX ---
+    
     const templates = [defaultTemplate]; // Start our list with the default template
     
     for (let i = 0; i < templateData.length; i++) {
@@ -2182,6 +2196,8 @@ function webGetCoachingTemplates() {
     return { error: err.message };
   }
 }
+
+
 /**
  * Saves a coaching template (both new and existing).
  */
