@@ -1316,6 +1316,73 @@
         .coaching-list-header .export-btn {
           width: 100%;
         }
+        /* --- NEW: Coaching Details Modal --- */
+      .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background-color: var(--card-bg);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .modal-header {
+        padding: 20px 30px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-header h2 {
+        margin: 0;
+        color: var(--konecta-blue);
+      }
+      .modal-header .close-btn {
+        font-size: 2rem;
+        font-weight: 300;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0 5px;
+        background: none;
+        border: none;
+        color: var(--text-color-secondary);
+      }
+      .modal-body {
+        padding: 30px;
+        overflow-y: auto;
+      }
+      .modal-footer {
+        padding: 20px 30px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+      }
+      .modal-summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 10px 20px;
+        margin-bottom: 20px;
+      }
+      .modal-summary-grid strong {
+        color: var(--text-color-secondary);
+      }
+      /* --- END: Coaching Details Modal --- */
+
+
       }
     </style>
   </head>
@@ -1796,7 +1863,46 @@
     <footer>
       <p>Konecta Adherence Portal - Created by Fady Bekhet</p>
     </footer>
+    <div id="coaching-details-modal" class="modal-backdrop" onclick="closeCoachingDetails()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        
+        <div class="modal-header">
+          <h2 id="modal-title">Coaching Details</h2>
+          <button class="close-btn" onclick="closeCoachingDetails()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="modal-summary-grid">
+            <strong>Agent:</strong> <span id="modal-agent-name"></span>
+            <strong>Coach:</strong> <span id="modal-coach-name"></span>
+            <strong>Date:</strong> <span id="modal-session-date"></span>
+            <strong>Week:</strong> <span id="modal-week-number"></span>
+            <strong>Template:</strong> <span id="modal-template-name"></span>
+            <strong>Score:</strong> <span id="modal-overall-score"></span>
+          </div>
+          
+          <hr class="section-divider">
+          
+          <div id="modal-scores-list">
+            </div>
+          
+          <hr class="section-divider">
 
+          <h4>Follow-up / Comments</h4>
+          <p id="modal-follow-up-comment" class="text-color-secondary"></p>
+          
+          <h4>Follow-up Date & Status</h4>
+          <p id="modal-follow-up-status"></p>
+
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="export-btn" style="display:block; background-color: var(--text-color-secondary);" onclick="exportSingleCoachingSession()">Export this Session</button>
+          <button type="button" onclick="closeCoachingDetails()">Close</button>
+        </div>
+
+      </div>
+    </div>
 
     <script>
       let selfUserName = ""; 
@@ -1944,10 +2050,40 @@
                // Re-draw on tab switch to apply theme/resize changes
                drawDashboard(window.lastDashboardData);
            }
-        // ADD THIS NEW BLOCK
         } else if (tabName === 'coaching') {
-          loadMyCoaching(); // <-- Use the new function name
+          // --- THIS IS THE CORRECTED BLOCK ---
+          loadMyCoaching(); // This loads the history list
+
+          // Load templates into the "Submit" form dropdown
+          const templateSelect = document.getElementById('coaching-template-select');
           
+          // Only load if not already loaded (options.length <= 1 means only the default "-- Select --" is there)
+          if (templateSelect && templateSelect.options.length <= 1) { 
+            templateSelect.innerHTML = '<option value="">-- Loading templates... --</option>';
+            
+            // Check if we already have templates from the admin tab
+            if (allTemplates && allTemplates.length > 0) {
+              console.log("Using cached templates for coaching form.");
+              populateTemplateDropdown(allTemplates);
+            } else {
+              // If not, fetch them
+              console.log("Fetching templates for coaching form...");
+              google.script.run
+                .withSuccessHandler(templates => {
+                  if (templates && !templates.error) {
+                    allTemplates = templates; // Save to global state
+                    populateTemplateDropdown(templates);
+                  } else {
+                    templateSelect.innerHTML = '<option value="">-- Error loading templates --</option>';
+                  }
+                })
+                .withFailureHandler(err => {
+                    templateSelect.innerHTML = '<option value="">-- Error loading templates --</option>';
+                })
+                .webGetCoachingTemplates();
+            }
+          }
+          // --- END OF CORRECTED BLOCK ---
         }
       }
       
@@ -3736,51 +3872,45 @@
         }
       }
 
-      /**
-       * Dynamically builds the QA form from the category data.
-       */
-      function buildQualityForm() {
-        const formDiv = document.getElementById('quality-score-form');
-        if (!formDiv) return;
-        
-        let html = '';
-        qualityCategories.forEach((cat, catIndex) => {
-          html += `<div class="qa-category"><h4>${cat.category}</h4>`;
-          
-          cat.criteria.forEach((crit, critIndex) => {
-            html += `
-              <div class="qa-criterion">
-                <p>${crit}</p>
-                <div class="qa-criterion-inputs">
-                  <select id="qa-score-${catIndex}-${critIndex}" onchange="calculateOverallScore()">
-                    ${scoreOptions.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
-                  </select>
-                  <textarea id="qa-comment-${catIndex}-${critIndex}" placeholder="Enter comments..."></textarea>
-                </div>
-              </div>
-            `;
-          });
-          html += `</div>`;
-        });
-        formDiv.innerHTML = html;
-      }
+      const INPUT_SCORE_OPTIONS = {
+        "score_0-1": [
+          { text: "-- Select Score --", value: "null" },
+          { text: "Got It (1)", value: "1" },
+          { text: "Getting There (0.5)", value: "0.5" },
+          { text: "Missed It (0)", value: "0" }
+        ],
+        "yes_no": [
+          { text: "-- Select --", value: "null" },
+          { text: "Yes", value: "1" },
+          { text: "No", value: "0" }
+        ],
+        "text_comment": [] // No score options for comment-only
+      };
 
       /**
        * Calculates and displays the overall QA score.
+       * (MODIFIED to read from dynamic form)
        */
       function calculateOverallScore() {
         let totalScore = 0;
         let totalPossible = 0;
-        
-        qualityCategories.forEach((cat, catIndex) => {
-          cat.criteria.forEach((crit, critIndex) => {
-            const scoreSelect = document.getElementById(`qa-score-${catIndex}-${critIndex}`);
-            if (scoreSelect && scoreSelect.value !== "null") {
-              totalScore += parseFloat(scoreSelect.value);
-              totalPossible += 1; // Each item is worth 1 point max
+
+        // Find the currently selected template
+        const templateID = document.getElementById('coaching-template-select').value;
+        const template = allTemplates.find(t => t.templateID === templateID);
+
+        if (template) {
+          template.criteria.forEach(item => {
+            // Only count items that are scoreable
+            if (item.inputType === 'score_0-1' || item.inputType === 'yes_no') {
+              const scoreSelect = document.getElementById(`score-${item.itemID}`);
+              if (scoreSelect && scoreSelect.value !== "null") {
+                totalScore += parseFloat(scoreSelect.value);
+                totalPossible += 1; // Each scoreable item is worth 1 point max
+              }
             }
           });
-        });
+        }
         
         const scoreSpan = document.getElementById('coaching-overall-score');
         if (totalPossible === 0) {
@@ -3862,7 +3992,7 @@
               </div>
               <div class="item-actions">
                  <!-- TODO: Add function to view details -->
-                 <button type="button" class="deny-btn" style="background-color: var(--text-color-secondary); opacity: 0.6; cursor: not-allowed;" disabled title="Details coming soon">View Details</button>
+                 <button type="button" class="view-btn" style="background-color: var(--text-color-secondary);" onclick="showCoachingDetails('${session.sessionID}')">View Details</button>
               </div>
             </div>
           `;
@@ -3929,56 +4059,196 @@
      link.click();
      document.body.removeChild(link);
      }
+     /**
+       * (NEW)
+       * Shows the coaching details modal for a specific session.
+       */
+      function showCoachingDetails(sessionID) {
+        const session = lastCoachingData.find(s => s.sessionID === sessionID);
+        if (!session) {
+          alert("Error: Could not find session data.");
+          return;
+        }
+
+        // 1. Find template name
+        const template = allTemplates.find(t => t.templateID === session.templateID);
+        const templateName = template ? template.templateName : (session.templateID || "Unknown Template");
+
+        // 2. Populate Summary
+        document.getElementById('modal-agent-name').textContent = session.agentName;
+        document.getElementById('modal-coach-name').textContent = session.coachName;
+        document.getElementById('modal-session-date').textContent = formatDate(session.sessionDate);
+        document.getElementById('modal-week-number').textContent = session.weekNumber;
+        document.getElementById('modal-template-name').textContent = templateName;
+        document.getElementById('modal-overall-score').innerHTML = `<strong style="color:var(--konecta-dark);">${parseFloat(session.overallScore || 0).toFixed(2)}%</strong>`;
+
+        // 3. Populate Follow-up
+        document.getElementById('modal-follow-up-comment').textContent = session.followUpComment || "No comments left.";
+        
+        let fuStatus = session.followUpStatus || '';
+        let fuDate = session.followUpDate ? formatDate(session.followUpDate) : 'N/A';
+        if (fuStatus === 'Pending') {
+          document.getElementById('modal-follow-up-status').innerHTML = `<span class="status-badge status-pending">${fuDate}</span>`;
+        } else if (fuStatus) {
+          document.getElementById('modal-follow-up-status').textContent = `${fuDate} (${fuStatus})`;
+        } else {
+          document.getElementById('modal-follow-up-status').textContent = "No follow-up date set.";
+        }
+
+        // 4. Populate Scores List
+        const scoresListDiv = document.getElementById('modal-scores-list');
+        let scoresHtml = '';
+        let currentCategory = '';
+        
+        session.scores.sort((a, b) => (a.category > b.category) ? 1 : -1); // Simple sort by category
+
+        session.scores.forEach(score => {
+          if (score.category !== currentCategory) {
+            if (currentCategory !== '') scoresHtml += `</div>`; // Close previous category
+            currentCategory = score.category;
+            scoresHtml += `<div class="qa-category"><h4>${currentCategory}</h4>`;
+          }
+
+          let scoreDisplay = '';
+          if (score.scoreValue === 1) scoreDisplay = '<span class="status-badge status-approved" style="margin-top:0;">Got It (1)</span>';
+          else if (score.scoreValue === 0.5) scoreDisplay = '<span class="status-badge status-pending" style="margin-top:0;">Getting There (0.5)</span>';
+          else if (score.scoreValue === 0) scoreDisplay = '<span class="status-badge status-denied" style="margin-top:0;">Missed It (0)</span>';
+          else scoreDisplay = '<span class="text-color-secondary">(N/A)</span>';
+
+          scoresHtml += `
+            <div class="qa-criterion">
+              <p>${score.criteriaText}</p>
+              <div class="form-row" style="justify-content: space-between; align-items: center;">
+                ${scoreDisplay}
+                <small class="text-color-secondary" style="font-style: italic;">${score.commentText || ""}</small>
+              </div>
+            </div>
+          `;
+        });
+        scoresHtml += `</div>`; // Close the last category
+        scoresListDiv.innerHTML = scoresHtml;
+        
+        // 5. Set Export Button ID
+        document.getElementById('modal-footer').querySelector('.export-btn').setAttribute('onclick', `exportSingleCoachingSession('${sessionID}')`);
+
+        // 6. Show Modal
+        document.getElementById('coaching-details-modal').style.display = 'flex';
+      }
 
       /**
+       * (NEW)
+       * Closes the coaching details modal.
+       */
+      function closeCoachingDetails() {
+        document.getElementById('coaching-details-modal').style.display = 'none';
+      }
+
+      /**
+       * (NEW)
+       * Exports a single coaching session from the modal.
+       */
+      function exportSingleCoachingSession(sessionID) {
+        const session = lastCoachingData.find(s => s.sessionID === sessionID);
+        if (!session) {
+          alert("Error: Could not find session data to export.");
+          return;
+        }
+
+        // Use the same export logic as exportCoachingHistory, but with only one item
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "SessionID,AgentName,CoachName,SessionDate,WeekNumber,OverallScore,FollowUpComment,FollowUpDate,FollowUpStatus,Score_Category,Score_Criteria,Score_Value,Score_Comment\r\n";
+        
+        const followUpComment = `"${(session.followUpComment || "").replace(/"/g, '""')}"`;
+        const baseRow = [
+          session.sessionID, session.agentName, session.coachName,
+          formatDate(session.sessionDate), session.weekNumber, session.overallScore || 'N/A',
+          followUpComment,
+          session.followUpDate ? formatDate(session.followUpDate) : 'N/A',
+          session.followUpStatus || 'N/A'
+        ];
+
+        if (session.scores && session.scores.length > 0) {
+          session.scores.forEach(score => {
+            const scoreComment = `"${(score.commentText || "").replace(/"/g, '""')}"`;
+            const detailRow = [
+              score.category,
+              `"${(score.criteriaText || "").replace(/"/g, '""')}"`,
+              score.scoreValue,
+              scoreComment
+            ];
+            csvContent += baseRow.join(",") + "," + detailRow.join(",") + "\r\n";
+          });
+        } else {
+          csvContent += baseRow.join(",") + ",N/A,N/A,N/A,N/A\r\n";
+        }
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Coaching_Session_${session.agentName}_${session.sessionID}.csv`);
+        document.body.appendChild(link); 
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      
+
+     /**
        * Submits the new coaching session form.
+       * (MODIFIED to read from dynamic form and submit new V2 object)
        */
       function submitNewCoaching() {
         try {
-          // Get user data
+          // --- 1. Get Session Data ---
           const agentSelect = document.getElementById('coaching-agent-select');
           const selectedEmail = agentSelect.value;
-          
           if (!selectedEmail) throw new Error("Please select an agent.");
           
           const sessionDate = document.getElementById('coaching-session-date').value;
           if (!sessionDate) throw new Error("Please select a session date.");
           
+          const templateSelect = document.getElementById('coaching-template-select');
+          const templateID = templateSelect.value;
+          if (!templateID) throw new Error("Please select a coaching template.");
+
           const weekNumber = document.getElementById('coaching-week-number').value;
           const followUpComment = document.getElementById('coaching-follow-up').value;
-          // *** NEW: Get follow-up date ***
           const followUpDate = document.getElementById('coaching-follow-up-date').value;
 
-          // Gather scores
+          // --- 2. Find Template and Gather Scores ---
+          const template = allTemplates.find(t => t.templateID === templateID);
+          if (!template) throw new Error("Critical: Could not find template data.");
+
           const scores = [];
-          qualityCategories.forEach((cat, catIndex) => {
-            cat.criteria.forEach((crit, critIndex) => {
-              const score = document.getElementById(`qa-score-${catIndex}-${critIndex}`).value;
-              const comment = document.getElementById(`qa-comment-${catIndex}-${critIndex}`).value;
-              
-              // Only save if a score was selected
-              if (score !== "null") {
-                scores.push({
-                  category: cat.category,
-                  criteria: crit,
-                  score: parseFloat(score),
-                  comment: comment
-                });
-              }
-            });
+          template.criteria.forEach(item => {
+            const scoreEl = document.getElementById(`score-${item.itemID}`);
+            const commentEl = document.getElementById(`comment-${item.itemID}`);
+            
+            const scoreValue = scoreEl ? scoreEl.value : "null";
+            const commentText = commentEl ? commentEl.value : "";
+
+            // Only save if a score was selected OR a comment was left
+            if (scoreValue !== "null" || commentText.trim() !== "") {
+              scores.push({
+                itemID: item.itemID,
+                scoreValue: scoreValue === "null" ? null : parseFloat(scoreValue),
+                commentText: commentText
+              });
+            }
           });
 
-          // Calculate final score
+          // --- 3. Calculate Final Score ---
           const { percentage } = calculateOverallScore();
 
+          // --- 4. Build Final Object ---
           const sessionObject = {
             agentEmail: selectedEmail,
             sessionDate: sessionDate,
             weekNumber: weekNumber,
-            scores: scores,
+            templateID: templateID, // NEW: Send the TemplateID
+            scores: scores, // NEW: Send the V2 scores array
             followUpComment: followUpComment,
             overallScore: percentage,
-            // *** NEW: Add follow-up date to object ***
             followUpDate: followUpDate || null 
           };
           
@@ -3991,20 +4261,16 @@
               } else {
                 setStatus('coaching-submit-status', 'success', msg);
                 // Reset form
-                // Use .reset() on the parent form element, if it exists
-                const form = document.getElementById('coaching-form-container');
-                if (form && typeof form.reset === 'function') {
-                    form.reset();
-                } else {
-                    // Manual reset as fallback
-                    document.getElementById('coaching-agent-select').selectedIndex = 0;
-                    document.getElementById('coaching-follow-up').value = '';
-                    document.getElementById('coaching-follow-up-date').value = '';
-                }
-                
+                document.getElementById('coaching-agent-select').selectedIndex = 0;
+                document.getElementById('coaching-follow-up').value = '';
+                document.getElementById('coaching-follow-up-date').value = '';
                 document.getElementById('coaching-session-date').valueAsDate = new Date();
+                
+                // Reset template dropdown and clear form
+                document.getElementById('coaching-template-select').selectedIndex = 0;
+                document.getElementById('quality-score-form').innerHTML = '<p class="text-color-secondary">Please select a template to begin.</p>';
+                
                 updateWeekNumber();
-                buildQualityForm(); // Re-builds the form, clearing it
                 calculateOverallScore(); // Resets score display
                 loadMyCoaching(); // Refresh the history list
               }
@@ -4012,7 +4278,7 @@
             .withFailureHandler(err => {
               setStatus('coaching-submit-status', 'error', err.message);
             })
-            .webSubmitCoaching(sessionObject);
+            .webSubmitCoaching(sessionObject); // Calls the NEW V2 function
 
         } catch (err) {
           setStatus('coaching-submit-status', 'error', err.message);
@@ -4033,6 +4299,80 @@
           templateSelect.appendChild(option);
         });
       }
+      /**
+       * (NEW)
+       * Called when the user selects a template from the coaching dropdown.
+       * This function dynamically builds the coaching form.
+       */
+      function onCoachingTemplateChange() {
+        const templateSelect = document.getElementById('coaching-template-select');
+        const templateID = templateSelect.value;
+        const formDiv = document.getElementById('quality-score-form');
+
+        if (!templateID) {
+          formDiv.innerHTML = '<p class="text-color-secondary">Please select a template to begin.</p>';
+          calculateOverallScore(); // Resets score to N/A
+          return;
+        }
+
+        const template = allTemplates.find(t => t.templateID === templateID);
+        if (!template) {
+          formDiv.innerHTML = '<p class="status-message error visible">Error: Could not find selected template.</p>';
+          return;
+        }
+
+        let html = '';
+        let currentCategory = '';
+
+        // Sort criteria by itemOrder to ensure they render in the correct order
+        template.criteria.sort((a, b) => a.itemOrder - b.itemOrder);
+
+        template.criteria.forEach(item => {
+          // If this is a new category, create the category container
+          if (item.category !== currentCategory) {
+            currentCategory = item.category;
+            html += `<div class="qa-category"><h4>${currentCategory}</h4>`;
+          }
+
+          // Get the score options for this input type
+          const options = INPUT_SCORE_OPTIONS[item.inputType];
+          let scoreSelectHtml = '';
+
+          if (options && options.length > 0) {
+            // Build a <select> dropdown for scoreable items
+            scoreSelectHtml = `
+              <select id="score-${item.itemID}" class="dynamic-score-input" data-input-type="${item.inputType}" onchange="calculateOverallScore()">
+                ${options.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
+              </select>
+            `;
+          } else {
+            // This is a "text_comment" only item, no score dropdown
+            scoreSelectHtml = `<input type="hidden" id="score-${item.itemID}" class="dynamic-score-input" data-input-type="${item.inputType}" value="null">`;
+          }
+
+          // Build the full criteria item
+          html += `
+            <div class="qa-criterion">
+              <p>${item.criteriaText}</p>
+              <div class="qa-criterion-inputs">
+                ${scoreSelectHtml}
+                <textarea id="comment-${item.itemID}" placeholder="Enter comments..."></textarea>
+              </div>
+            </div>
+          `;
+
+          // Check if this is the last item in this category
+          const nextItem = template.criteria.find(c => c.itemOrder > item.itemOrder);
+          if (!nextItem || nextItem.category !== currentCategory) {
+            html += `</div>`; // Close the qa-category div
+          }
+        });
+
+        formDiv.innerHTML = html;
+        calculateOverallScore(); // Calculate score for the newly built form
+      }
+
+
       /**
        * Called when the "Coaching Admin" tab is shown, or on page load
        */
@@ -4063,7 +4403,24 @@
           })
           .webGetCoachingTemplates();
       }
+       /**
+       * (NEW HELPER FUNCTION)
+       * Populates the coaching submission template dropdown
+       */
+      function populateTemplateDropdown(templates) {
+        const templateSelect = document.getElementById('coaching-template-select');
+        if (!templateSelect) return; // Safety check
 
+        templateSelect.innerHTML = '<option value="">-- Select a template --</option>';
+        templates.forEach(t => {
+          const option = document.createElement('option');
+          option.value = t.templateID;
+          option.textContent = t.templateName;
+          templateSelect.appendChild(option);
+        });
+      }
+
+     
       /**
        * Clears the form and shows it to create a new template
        */
@@ -4349,7 +4706,7 @@
         // NEW: Coaching form init
         document.getElementById('coaching-session-date').valueAsDate = new Date();
         document.getElementById('coaching-session-date').addEventListener('change', updateWeekNumber);
-        buildQualityForm();
+        
         updateWeekNumber();
         calculateOverallScore();
 
