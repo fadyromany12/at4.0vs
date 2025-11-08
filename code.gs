@@ -237,7 +237,6 @@ function webSubmitCoaching(sessionObject) {
     }
 
     return `Coaching session for ${agentName} saved successfully.`;
-
   } catch (err) {
     Logger.log("webSubmitCoaching Error: " + err.message);
     return "Error: " + err.message;
@@ -2099,8 +2098,8 @@ function updateReportingLine(adminEmail, userEmail, newSupervisorEmail) {
 // === NEW COACHING TEMPLATE FUNCTIONS (PHASE 3) ===
 // ==========================================================
 
-/**
- * Gets all non-archived coaching templates and their criteria.
+ /**
+ * Gets all non-archived coaching templates AND the hard-coded default.
  */
 function webGetCoachingTemplates() {
   try {
@@ -2108,7 +2107,36 @@ function webGetCoachingTemplates() {
     const templateSheet = getOrCreateSheet(ss, "CoachingTemplates");
     const criteriaSheet = getOrCreateSheet(ss, "CoachingTemplateCriteria");
 
-    // 1. Get all criteria and map them by TemplateID
+    // === 1. DEFINE THE DEFAULT, HARD-CODED TEMPLATE ===
+    const defaultTemplate = {
+      templateID: "default-quality-score",
+      templateName: "Quality Score (Default)",
+      createdBy: "System",
+      dateCreated: new Date(),
+      criteria: [
+        { itemID: "default-0-0", category: "Greeting & Opening", criteriaText: "Agent greeted the customer professionally and introduced themselves appropriately", inputType: "score_0-1", weight: 1, itemOrder: 0 },
+        { itemID: "default-0-1", category: "Greeting & Opening", criteriaText: "Agent confirmed the customer’s name & purpose of the call/chat", inputType: "score_0-1", weight: 1, itemOrder: 1 },
+        { itemID: "default-1-0", category: "Communication Skills & Understanding Needs", criteriaText: "Agent conversed actively without interrupting", inputType: "score_0-1", weight: 1, itemOrder: 2 },
+        { itemID: "default-1-1", category: "Communication Skills & Understanding Needs", criteriaText: "Agent asked relevant questions to understand customer needs", inputType: "score_0-1", weight: 1, itemOrder: 3 },
+        { itemID: "default-1-2", category: "Communication Skills & Understanding Needs", criteriaText: "Agent acknowledged customer concerns appropriately", inputType: "score_0-1", weight: 1, itemOrder: 4 },
+        { itemID: "default-1-3", category: "Communication Skills & Understanding Needs", criteriaText: "Language was clear, understandable, and free of jargon", inputType: "score_0-1", weight: 1, itemOrder: 5 },
+        { itemID: "default-1-4", category: "Communication Skills & Understanding Needs", criteriaText: "Agent applied correct hold etiquettes", inputType: "score_0-1", weight: 1, itemOrder: 6 },
+        { itemID: "default-1-5", category: "Communication Skills & Understanding Needs", criteriaText: "Tone was confident, professional and engaging", inputType: "score_0-1", weight: 1, itemOrder: 7 },
+        { itemID: "default-2-0", category: "Product Knowledge & providing solution", criteriaText: "Agent demonstrated strong knowledge of Lenovo products/services", inputType: "score_0-1", weight: 1, itemOrder: 8 },
+        { itemID: "default-2-1", category: "Product Knowledge & providing solution", criteriaText: "Agent offered the right solution based on customer's needs", inputType: "score_0-1", weight: 1, itemOrder: 9 },
+        { itemID: "default-2-2", category: "Product Knowledge & providing solution", criteriaText: "Agent was able to handle objections confidently & Highlighted Lenovo's competitive advantage", inputType: "score_0-1", weight: 1, itemOrder: 10 },
+        { itemID: "default-3-0", category: "Tools usage and Chat/ Call Logging", criteriaText: "Agent applied correct disposition.", inputType: "score_0-1", weight: 1, itemOrder: 11 },
+        { itemID: "default-3-1", category: "Tools usage and Chat/ Call Logging", criteriaText: "Agent logged the chat with all relevant details in Dynamics 365 B2C", inputType: "score_0-1", weight: 1, itemOrder: 12 },
+        { itemID: "default-4-0", category: "Sales Closing & Call to Action", criteriaText: "Agent clearly stated pricing, offers, and benefits.", inputType: "score_0-1", weight: 1, itemOrder: 13 },
+        { itemID: "default-4-1", category: "Sales Closing & Call to Action", criteriaText: "Agent confirmed next steps (e.g., sending a quote, scheduling a follow-up)", inputType: "score_0-1", weight: 1, itemOrder: 14 },
+        { itemID: "default-5-0", category: "Process Compliance", criteriaText: "Agent followed Lenovo's sales process & compliance guidelines. OR Agent transfered the chat to the approriate que when applicable", inputType: "score_0-1", weight: 1, itemOrder: 15 },
+        { itemID: "default-6-0", category: "Wrap-Up & Closing", criteriaText: "Agent confirmed if the customer’s query was fully addressed", inputType: "score_0-1", weight: 1, itemOrder: 16 },
+        { itemID: "default-6-1", category: "Wrap-Up & Closing", criteriaText: "Agent ended the chat approprietly.", inputType: "score_0-1", weight: 1, itemOrder: 17 },
+        { itemID: "default-6-2", category: "Wrap-Up & Closing", criteriaText: "Follow-up commitment created (if applicable)", inputType: "score_0-1", weight: 1, itemOrder: 18 }
+      ]
+    };
+    
+    // 2. Get all criteria from the sheet and map them by TemplateID
     const criteriaData = criteriaSheet.getRange(2, 1, criteriaSheet.getLastRow() - 1, 7).getValues();
     const criteriaMap = {};
     for (let i = 0; i < criteriaData.length; i++) {
@@ -2127,9 +2155,10 @@ function webGetCoachingTemplates() {
       });
     }
 
-    // 2. Get all templates and attach their criteria
+    // 3. Get all templates from the sheet and attach their criteria
     const templateData = templateSheet.getRange(2, 1, templateSheet.getLastRow() - 1, 5).getValues();
-    const templates = [];
+    const templates = [defaultTemplate]; // Start our list with the default template
+    
     for (let i = 0; i < templateData.length; i++) {
       const row = templateData[i];
       const templateID = row[0];
@@ -2148,13 +2177,11 @@ function webGetCoachingTemplates() {
     }
     
     return templates;
-
   } catch (err) {
     Logger.log("webGetCoachingTemplates Error: " + err.message);
     return { error: err.message };
   }
 }
-
 /**
  * Saves a coaching template (both new and existing).
  */
